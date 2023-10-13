@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Oppgave1</string>
+    <string name="title_activity">Generer nummer</string>
+    <string name="to_main">Avslutt Aktivitet</string>
+</resources>

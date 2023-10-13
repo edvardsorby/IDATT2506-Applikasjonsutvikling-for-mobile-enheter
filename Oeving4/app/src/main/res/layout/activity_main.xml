@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:padding="16dp">
+
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/list"
+        android:name="no.ntnu.idatt2506.oeving4.ListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:padding="2dp"
+        tools:context="leksjon_04.QuestionsFragment"
+        tools:layout="@layout/fragment_list" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/description"
+        android:name="no.ntnu.idatt2506.oeving4.DescriptionFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:padding="2dp"
+        tools:context=""
+        tools:layout="@layout/fragment_description" />
+
+</LinearLayout>

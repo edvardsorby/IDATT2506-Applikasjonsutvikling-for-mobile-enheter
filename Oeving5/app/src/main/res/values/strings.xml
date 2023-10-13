@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Øving 5 - Tallspill</string>
+    <string name="name">Navn</string>
+    <string name="card">Kortnummer</string>
+    <string name="save">Lagre navn og kortnummer</string>
+    <string name="text">Vennligst registrer navn og kortnummer</string>
+    <string name="number">Tall</string>
+    <string name="play">Spill</string>
+</resources>

@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Oeving3</string>
+    <string name="name1">Edvard</string>
+    <string name="bday1">29.06.2002</string>
+    <string name="name2">Haakon</string>
+    <string name="bday2">29.09.2004</string>
+    <string name="name3">Henrik</string>
+    <string name="bday3">25.06.2001</string>
+    <string name="name4">Ole Håvard</string>
+    <string name="bday4">28.07.2002</string>
+
+    <string-array name="friendnames">
+        <item>@string/name1</item>
+        <item>@string/name2</item>
+        <item>@string/name3</item>
+        <item>@string/name4</item>
+    </string-array>
+
+    <string-array name="friendbdays">
+        <item>@string/bday1</item>
+        <item>@string/bday2</item>
+        <item>@string/bday3</item>
+        <item>@string/bday4</item>
+    </string-array>
+
+</resources>
