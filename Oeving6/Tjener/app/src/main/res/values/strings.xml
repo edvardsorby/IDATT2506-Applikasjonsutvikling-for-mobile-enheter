@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Tjener</string>
+    <string name="sent">Sendt</string>
+    <string name="received">Mottatt</string>
+    <string name="message">Melding</string>
+    <string name="send">Send</string>
+</resources>
