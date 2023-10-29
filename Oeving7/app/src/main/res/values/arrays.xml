@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="color_entries">
+        <item>Hvit</item>
+        <item>Grå</item>
+        <item>Grønn</item>
+        <item>Blå</item>
+    </string-array>
+
+    <string-array name="color_values">
+        <item>#FFFFFF</item>
+        <item>#9DBDCE</item>
+        <item>#00FF99</item>
+        <item>#00DDFF</item>
+    </string-array>
+
+
+    <string-array name="night_mode_entries">
+        <item>Følg systeminnstillinger</item>
+        <item>Alltid Av</item>
+        <item>Alltid På</item>
+        <item>Automatisk etter batteribruk</item>
+    </string-array>
+    <string-array name="night_mode_values">
+        <item>MODE_NIGHT_FOLLOW_SYSTEM</item>
+        <item>MODE_NIGHT_NO</item>
+        <item>MODE_NIGHT_YES</item>
+        <item>MODE_NIGHT_AUTO_BATTERY</item>
+    </string-array>
+</resources>

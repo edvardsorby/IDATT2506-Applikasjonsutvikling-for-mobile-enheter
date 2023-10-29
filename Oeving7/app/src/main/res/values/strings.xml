@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Øving7</string>
+    <string name="background_color_title">Bakgrunnsfarge</string>
+    <string name="background_color">background</string>
+    <string name="background_color_default_value">#FFFFFF</string>
+    <string name="back_button">Tilbake</string>
+    <string name="settings">Innstillinger</string>
+
+    <string name="night_mode_title">Nattmodus</string>
+    <string name="night_mode">nightMode</string>
+    <string name="night_mode_default_value">MODE_NIGHT_NO</string>
+</resources>
