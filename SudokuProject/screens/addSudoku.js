@@ -7,9 +7,9 @@ export default function AddSudoku() {
   const [selectedRadioButton, setSelectedRadioButton] = useState(0);
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text style={styles.header}>Create new sudoku</Text>
-      <Grid />
+      <Grid data={{}}/>
       <Text>Difficulty:</Text>
       <View style={styles.radioButtonGroup}>
         <TouchableOpacity onPress={() => setSelectedRadioButton(0)}>
@@ -50,7 +50,7 @@ export default function AddSudoku() {
 
       </View>
       <View style={styles.button}>
-        <Button title="Legg til sudoku" style={styles.button}/>
+        <Button title="Add sudoku" style={styles.button}/>
       </View>
     </View>
   )
@@ -97,5 +97,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     marginBottom: 30
-  }
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 })

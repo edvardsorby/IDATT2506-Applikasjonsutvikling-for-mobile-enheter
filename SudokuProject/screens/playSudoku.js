@@ -1,28 +1,18 @@
+import { Button, View, StyleSheet, TouchableOpacity, Text, Activit, ActivityIndicator, TextInput, Alert } from "react-native";
+import Grid from "../components/grid";
 import { useState } from "react";
-import { View, StyleSheet, TextInput, Text, Button, Alert } from "react-native";
 
-export default function Grid( {data, solution} ) {
+export default function PlaySudoku( { route } ) {
 
-  let initial = [
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0]
-  ];
-
- 
-
-  let sudoku = data;
+  const { value, init, solution } = route.params;
 
 
-  let answer = solution;
 
-  let selectedCell;
+  const initialValues = JSON.parse(JSON.stringify(init));
+
+  let sudoku = value;
+
+  const [selectedCell, setSelectedCell] = useState(null);
 
   const [colors, setColors] = useState([
     [0,0,0,0,0,0,0,0,0],
@@ -63,14 +53,14 @@ export default function Grid( {data, solution} ) {
       let blank = false;
       if (sudoku[n][i]== 0) blank = true
       cells.push(
-        <View style={[styles.cell, i == 3 ? styles.marginLeft : null, i == 5 ? styles.marginRight : null, colors[n][i] == 1 ? styles.green : null, colors[n][i] == 2 ? styles.yellow : null, colors[n][i] == 3 ? styles.red : null,]} key={key}>
+        <View style={[styles.cell, i == 3 ? styles.marginLeft : null, i == 5 ? styles.marginRight : null, findColor(n,i)]} key={key}>
           <TextInput keyboardType="numeric" 
             maxLength={1} 
             style={styles.textInput} 
             value={!blank ? sudoku[n][i].toString() : null}
             onChangeText={(e) => updateSudoku(e, key)}
-            editable={initialSudoku[n][i] == 0 ? true : false} 
-            onFocus={(e) => {focus(e, key)}}
+            editable={initialValues[n][i] == 0 ? true : false} 
+            onFocus={() => {focus(key)}}
             />
         </View>
       )
@@ -96,75 +86,42 @@ export default function Grid( {data, solution} ) {
 
 
   const updateSudoku = function(e, key) {
-    // console.log(e);
-    // console.log(key);
-    // console.log(key[0]);
-    // console.log(key[1]);
+    console.log(initialValues);
     sudoku[key[0]][key[1]] = parseInt(e);
-    console.log("S: " + sudoku);
-    console.log("D: " + data);
-    console.log("I: " + initial);
-    console.log("init1: " + init1);
-    console.log("init2: " + initialSudoku);
+    console.log(initialValues);
   }
 
   const checkAnswer = function() {
-    console.log(answer);
+    console.log(solution);
     console.log(sudoku);
 
-    if (JSON.stringify(sudoku) === JSON.stringify(answer)) {
-      console.log("Hurra!");
-      Alert.alert("Hurra!", "Det var riktig svar");
+    if (JSON.stringify(sudoku) === JSON.stringify(solution)) {
+      console.log("Correct solution!");
+      Alert.alert("Congratulations!", "You have solved the sudoku");
     } else {
-      console.log("Feil!");
-      Alert.alert("Feil", "Du har ikke løst sudokuen riktig");
+      console.log("Wrong solution");
+      Alert.alert("Wrong!", "You have not solved the sudoku correctly");
     }
   }
 
-  const focus = function(e, key) {
-    //console.log(e);
-    
-    // setSelectedCell(key);
-    selectedCell = key;
+  const focus = function(key) {
+    setSelectedCell(key);
     console.log(key);
-    
-    // setColors(prevColors => {
-    //   const newColors = colors;
-    //   newColors[selectedCell[0]][selectedCell[1]] = 1;
-    //   // return newColors;
-    //   setColors(newColors);
-    // // });
-
-
-    // console.log(selectedCell);
-
-    // console.log(colors);
-    
-    
-    
-    // setTest(prevTest => {
-      //   const newTest = [...prevTest];
-      //   newTest[0] = false;
-      //   return newTest;
-      // });
-      // console.log(test);
     }
     
     const setGreen = function() {
-      console.log(selectedCell);
-      // const newColors = colors;
-      // newColors[selectedCell[0]][selectedCell[1]] = 1;
-      // setColors(newColors);
-      
+      if (selectedCell === null) return;
+
       setColors(prevColors => {
         const newColors = [...prevColors];
         newColors[selectedCell[0]][selectedCell[1]] = 1;
         return newColors;
       });
-      console.log(selectedCell);
     }
     
     const setYellow = function() {
+      if (selectedCell === null) return;
+
       setColors(prevColors => {
       const newColors = [...prevColors];
       newColors[selectedCell[0]][selectedCell[1]] = 2;
@@ -173,7 +130,8 @@ export default function Grid( {data, solution} ) {
   } 
 
   const setRed = function() {
-    console.log("CELLE:" + selectedCell);
+    if (selectedCell === null) return;
+
     setColors(prevColors => {
       const newColors = [...prevColors];
       newColors[selectedCell[0]][selectedCell[1]] = 3;
@@ -182,6 +140,8 @@ export default function Grid( {data, solution} ) {
   } 
 
   const setClear = function() {
+    if (selectedCell === null) return;
+
     setColors(prevColors => {
       const newColors = [...prevColors];
       newColors[selectedCell[0]][selectedCell[1]] = 0;
@@ -189,8 +149,10 @@ export default function Grid( {data, solution} ) {
     });
   }
 
+
   return (
-    <View>
+    <View style={styles.container}>
+      <Text>Play Sudoku</Text>
       <View style={styles.board}>
         {newBoard()}
       </View>
@@ -206,6 +168,54 @@ export default function Grid( {data, solution} ) {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    marginTop: 10,
+    marginBottom: 10,
+    width: '50%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  radioButton: {
+    width: 75,
+    height: 50,
+    backgroundColor: '#fff',
+    // borderRadius: 20,
+    borderColor: '#000',
+    borderWidth: 3,
+    marginTop: 20,
+  },
+  radioButtonText: {
+    textAlign: 'center'
+  },
+  radioButtonGroup: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  },
+  selectedEasy: {
+    backgroundColor: '#a3ff87',
+    height: '100%'
+  },
+  selectedMedium: {
+    backgroundColor: '#f9ff87',
+    height: '100%'
+  },
+  selectedHard: {
+    backgroundColor: '#ff8787',
+    height: '100%',
+  },
+  header: {
+    fontWeight: 'bold',
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 30
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   board: {
     backgroundColor: '#333333',
     display: 'flex',
@@ -251,5 +261,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff8787',
   },
 })
-
-
