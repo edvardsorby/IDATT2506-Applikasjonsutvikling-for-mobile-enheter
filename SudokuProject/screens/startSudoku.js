@@ -1,6 +1,9 @@
-import { Button, View, StyleSheet, TouchableOpacity, Text, Activit, ActivityIndicator } from "react-native";
+import { Button, View, StyleSheet, TouchableOpacity, Text, Activit, ActivityIndicator, Alert } from "react-native";
 import Grid from "../components/grid";
 import { useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomButton from "../components/button";
+
 
 export default function StartSudoku( { navigation }) {
 
@@ -38,25 +41,71 @@ export default function StartSudoku( { navigation }) {
     [8,0,3,0,6,0,0,0,7],
     [0,0,0,8,0,0,6,0,0],
     [0,0,0,0,9,7,5,8,3]
-  ]
+  ];
+
+  const [fetching, setFetching] = useState(false);
+
+  const getGrids = async (key) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(key);
+      console.log(JSON.parse(jsonValue));
+      console.log("Antall: " + JSON.parse(jsonValue).length);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+    }
+  };
 
 
-  const pressHandler = function() {
+  const startSudoku = async (difficulty) => {
 
-    navigation.navigate('PlaySudoku', {
-      value: value,
+    setFetching(true);
+    
+    const sudokus = await getGrids(difficulty);
+    
+    const noSudokus = sudokus.length;
+    
+    if (noSudokus < 1) {
+      Alert.alert("Cannot start sudoku", "There are no " + difficulty + " saved. Add more from the grid overview page.");
+    } else {
+      
+      
+      const i = Math.floor(Math.random() * noSudokus);
+      
+      const sudoku = sudokus[i];
+      
+      console.log(sudoku);
+      
+      init = JSON.parse(JSON.stringify(sudoku.value)); // Deep copy to keep init separate
+      
+      
+      
+      value = sudoku.value;
+      
+      solution = sudoku.solution;
+      
+      navigation.navigate('PlaySudoku', {
+        value: value,
       init: init,
       solution: solution
     });
   }
-
-
+  setFetching(false);
+}
+  
+  
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Start Sudoku</Text>
-      <View style={styles.button}>
-        <Button title="Start sudoku" style={styles.button} onPress={pressHandler}/>
-      </View>
+      {
+      !fetching ?
+        <View>
+          <CustomButton title="Start easy sudoku" style={styles.button} onPress={() => {startSudoku("easy-grids")}}/>
+          <CustomButton title="Start medium sudoku" style={styles.button} onPress={() => {startSudoku("medium-grids")}}/>
+          <CustomButton title="Start hard sudoku" style={styles.button} onPress={() => {startSudoku("hard-grids")}}/>
+        </View>
+        : <ActivityIndicator />}
+  
     </View>
   )
 }

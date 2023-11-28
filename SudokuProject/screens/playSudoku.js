@@ -1,6 +1,7 @@
-import { Button, View, StyleSheet, TouchableOpacity, Text, Activit, ActivityIndicator, TextInput, Alert } from "react-native";
+import { Button, View, StyleSheet, TouchableOpacity, Text, ActivityIndicator, TextInput, Alert } from "react-native";
 import Grid from "../components/grid";
 import { useState } from "react";
+import CustomButton from "../components/button";
 
 export default function PlaySudoku( { route } ) {
 
@@ -50,8 +51,8 @@ export default function PlaySudoku( { route } ) {
     // console.log(sudoku);
     for (let i = 0; i < 9; i++) {
       const key = n + "" + i;
-      let blank = false;
-      if (sudoku[n][i]== 0) blank = true
+      let blank = true;
+      if (!(initialValues[n][i] == 0)) blank = false
       cells.push(
         <View style={[styles.cell, i == 3 ? styles.marginLeft : null, i == 5 ? styles.marginRight : null, findColor(n,i)]} key={key}>
           <TextInput keyboardType="numeric" 
@@ -59,7 +60,7 @@ export default function PlaySudoku( { route } ) {
             style={styles.textInput} 
             value={!blank ? sudoku[n][i].toString() : null}
             onChangeText={(e) => updateSudoku(e, key)}
-            editable={initialValues[n][i] == 0 ? true : false} 
+            editable={blank ? true : false} 
             onFocus={() => {focus(key)}}
             />
         </View>
@@ -86,9 +87,11 @@ export default function PlaySudoku( { route } ) {
 
 
   const updateSudoku = function(e, key) {
-    console.log(initialValues);
+    
+    console.log(sudoku);
     sudoku[key[0]][key[1]] = parseInt(e);
-    console.log(initialValues);
+    if (!(sudoku[key[0]][key[1]] > 0 && sudoku[key[0]][key[1]] < 10)) sudoku[key[0]][key[1]] = 0;
+    console.log(sudoku);
   }
 
   const checkAnswer = function() {
@@ -156,12 +159,46 @@ export default function PlaySudoku( { route } ) {
       <View style={styles.board}>
         {newBoard()}
       </View>
-    <Text>Color the cells:</Text>
-    <Button title="Green" onPress={setGreen} />
-    <Button title="Yellow" onPress={setYellow} />
-    <Button title="Red" onPress={setRed} />
-    <Button title="Clear color" onPress={setClear} />
-    <Button title="Check answer" onPress={checkAnswer} />
+      <Text>Color the cells:</Text>
+
+      <View style={styles.radioButtonGroup}>
+
+      <TouchableOpacity onPress={setClear}>
+          <View style={styles.radioButton}>
+              <View>
+                <Text style={styles.radioButtonText}>Clear</Text>
+              </View>
+          </View>
+        </TouchableOpacity>
+  
+        <TouchableOpacity onPress={setGreen}>
+          <View style={styles.radioButton}>
+              <View style={styles.selectedEasy}>
+                <Text style={styles.radioButtonText}>Green</Text>
+              </View>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={setYellow}>
+        <View style={styles.radioButton}>
+              <View style={styles.selectedMedium}>
+                <Text style={styles.radioButtonText}>Yellow</Text>
+              </View>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={setRed}>
+        <View style={styles.radioButton}>
+              <View style={styles.selectedHard}>
+                <Text style={styles.radioButtonText}>Red</Text>
+              </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+      
+      <CustomButton title="Check answer" onPress={checkAnswer} />
+
+    
     </View>
 
   )
