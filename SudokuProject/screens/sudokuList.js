@@ -1,34 +1,30 @@
-import { Button, View, StyleSheet, TouchableOpacity, Text, TextInput, ActivityIndicator, FlatList, Alert } from "react-native";
-import Grid from "../components/grid";
-import { useState, useEffect } from "react";
+import { View, StyleSheet, Text, ActivityIndicator, FlatList, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GridPreview from "../components/gridPreview";
 import RadioButtons from "../components/radioButtons";
+import { useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
+import { globalStyles } from "../styles/global";
 
 export default function SudokuList() {
+
+  const { t } = useTranslation();
 
 
   const [fetching, setFetching] = useState(false);
 
   const [difficulty, setDifficulty] = useState("Medium");
 
-  const [grid, setGrid] = useState("Initial state");
-  // let grid = {initial: "initial"};
-
-  const [foundNewGrid, setFoundNewGrid] = useState(false);
-
-
-  
     
   const [grids, setGrids] = useState();
 
   const getGrids = async (key) => {
     try {
       const jsonValue = await AsyncStorage.getItem(key);
-      console.log(JSON.parse(jsonValue));
       return jsonValue != null ? JSON.parse(jsonValue) : [];
     } catch (e) {
-      // error reading value
+      console.log(e.message);
     }
   };
 
@@ -52,16 +48,10 @@ export default function SudokuList() {
   const updateGrids = async () => {
     try {
 
-
-
       const key = (difficulty + "-grids").toLowerCase();
       console.log("key = " + key)
 
-    
 
-  
-  
-      
       const jsonValue = JSON.stringify(grids);
 
       await AsyncStorage.setItem(key, jsonValue);
@@ -70,27 +60,25 @@ export default function SudokuList() {
 
       load();
     } catch (e) {
-      // saving error
+      console.log(e.message);
     }
   };
 
-  const Item = ({title}) => (
-    <View style={styles.item}>
-      <Text style={styles.title}>{title}</Text>
-    </View>
-  );
 
-  const deleteGrid = async (grid) => {
+  const deleteGrid = async (index) => {
 
-    const index = grids.indexOf(grid);
-    console.log(index);
-    
-    console.log(grids.length);
-    grids.splice(index, 1);
-    console.log(grids.length);
+    if (grids.length > 1) {
 
-
-    updateGrids();
+      console.log(index);
+      
+      console.log(grids.length);
+      grids.splice(index, 1);
+      console.log(grids.length);
+      
+      updateGrids();
+    } else {
+      Alert.alert(t("Cannot delete grid"), t("There has to be at least one grid per difficulty."));
+    }
   }
 
   
@@ -121,24 +109,25 @@ export default function SudokuList() {
     console.log(diff);
     setDifficulty(diff);
     console.log(difficulty);
-
-    //load();
   }
 
+  useFocusEffect( // Runs when returning to this screen
+    React.useCallback(() => {
+      load();
+    },[])
+  );
+  
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Sudoku list</Text>
+    <View style={globalStyles.container}>
+      <Text style={styles.header}>{t("Sudoku list")}</Text>
       <RadioButtons onPress={(value) => {onPressHandler(value)}} initialValue={1}/>
-      {/* <Button title="Load" onPress={load}/> */}
-      {fetching && <ActivityIndicator />}
-      {!fetching && grids && grids.length < 1 && <Text style={styles.warning}>There are no {difficulty.toLowerCase()} grids saved</Text>}
+      {fetching && <ActivityIndicator size={"large"} marginTop={200}/>}
       <View style={styles.list}>
-       {grids && <FlatList
+       {!fetching && grids && <FlatList
           data={grids}
-          renderItem={({item}) => 
-          // <Item title={item.difficulty} />
-          // <Grid data={item.value} />
-          <GridPreview data={item.value} deleteGrid={() => {deleteGrid(item)}} diff={difficulty}/>
+          renderItem={({item, index}) => 
+          <GridPreview data={item.value} deleteGrid={() => {deleteGrid(index)}} diff={difficulty} index={index}/>
         }
         />}
        
@@ -148,92 +137,14 @@ export default function SudokuList() {
 }
 
 const styles = StyleSheet.create({
-  button: {
-    marginTop: 10,
-    width: '50%',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-  radioButton: {
-    width: 75,
-    height: 50,
-    backgroundColor: '#fff',
-    // borderRadius: 20,
-    borderColor: '#000',
-    borderWidth: 3,
-    marginTop: 20,
-  },
-  radioButtonText: {
-    textAlign: 'center'
-  },
-  radioButtonGroup: {
-    flexDirection: 'row',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  },
-  selectedEasy: {
-    backgroundColor: '#a3ff87',
-    height: '100%'
-  },
-  selectedMedium: {
-    backgroundColor: '#f9ff87',
-    height: '100%'
-  },
-  selectedHard: {
-    backgroundColor: '#ff8787',
-    height: '100%',
-  },
   header: {
     fontWeight: 'bold',
     fontSize: 24,
     textAlign: 'center',
     marginBottom: 30
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  board: {
-    backgroundColor: '#333333',
-    display: 'flex',
-    padding: 1,
-  },
-  row: {
-    display: 'flex',
-    flexDirection: 'row'
-  },
-  cell: {
-    width: 30,
-    height: 30,
-    margin: 1,
-    backgroundColor: 'white',
-    textAlign: 'center'
-  },
-  marginLeft: {
-    marginLeft: 3,
-  },
-  marginRight: {
-    marginRight: 3,
-  },
-  marginTop: {
-    marginTop: 3,
-  },
-  marginBottom: {
-    marginBottom: 3,
-  },
-  textInput: {
-    fontSize: 20,
-    textAlign: 'center'
-  },
   list: {
     marginTop: 20,
     flex: 1,
-  },
-  warning: {
-    marginTop: 100,
-    fontSize: 24,
-    fontWeight: 'bold'
   }
 })

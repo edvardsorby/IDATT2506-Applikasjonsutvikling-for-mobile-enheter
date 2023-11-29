@@ -12,18 +12,20 @@ export default function CustomButton({ title, onPress }) {
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 8,
-    paddingVertical: 14,
+    borderRadius: 15,
+    paddingVertical: 15,
     paddingHorizontal: 10,
-    backgroundColor: 'green',
+    backgroundColor: '#00796B',
     width: 200,
-    margin: 5
+    margin: 5,
+    marginLeft: 'auto',
+    marginRight: 'auto'
   },
   buttonText: {
     color: '#ffffff',
     fontWeight: 'bold',
     textTransform: 'none',
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
   }
 })

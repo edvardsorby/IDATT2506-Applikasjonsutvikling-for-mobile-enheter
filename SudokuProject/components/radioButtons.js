@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 
 export default function RadioButtons({ onPress, initialValue }) {
+
+  const { t } = useTranslation();
 
   const [selectedRadioButton, setSelectedRadioButton] = useState(initialValue);
 
@@ -18,10 +21,10 @@ export default function RadioButtons({ onPress, initialValue }) {
           <View style={styles.radioButton}>
             { selectedRadioButton == 0? 
               <View style={styles.selectedEasy}>
-                <Text style={styles.radioButtonText}>Easy</Text>
+                <Text style={styles.radioButtonText}>{t("Easy")}</Text>
               </View>
               :
-              <Text style={styles.radioButtonText}>Easy</Text>
+              <Text style={styles.radioButtonText}>{t("Easy")}</Text>
               }
           </View>
         </TouchableOpacity>
@@ -30,10 +33,10 @@ export default function RadioButtons({ onPress, initialValue }) {
         <View style={styles.radioButton}>
             { selectedRadioButton == 1? 
               <View style={styles.selectedMedium}>
-                <Text style={styles.radioButtonText}>Medium</Text>
+                <Text style={styles.radioButtonText}>{t("Medium")}</Text>
               </View>
               :
-              <Text style={styles.radioButtonText}>Medium</Text>
+              <Text style={styles.radioButtonText}>{t("Medium")}</Text>
               }
           </View>
         </TouchableOpacity>
@@ -42,10 +45,10 @@ export default function RadioButtons({ onPress, initialValue }) {
         <View style={styles.radioButton}>
             { selectedRadioButton == 2? 
               <View style={styles.selectedHard}>
-                <Text style={styles.radioButtonText}>Hard</Text>
+                <Text style={styles.radioButtonText}>{t("Hard")}</Text>
               </View>
               :
-              <Text style={styles.radioButtonText}>Hard</Text>
+              <Text style={styles.radioButtonText}>{t("Hard")}</Text>
               }
           </View>
         </TouchableOpacity>
@@ -74,13 +77,16 @@ const styles = StyleSheet.create({
     width: 75,
     height: 50,
     backgroundColor: '#fff',
-    // borderRadius: 20,
+    borderRadius: 20,
     borderColor: '#000',
     borderWidth: 3,
     marginTop: 20,
+    marginRight: 10
   },
   radioButtonText: {
-    textAlign: 'center'
+    textAlign: 'center',
+    marginTop: 10,
+    fontWeight: 'bold'
   },
   radioButtonGroup: {
     flexDirection: 'row',
@@ -89,14 +95,17 @@ const styles = StyleSheet.create({
   },
   selectedEasy: {
     backgroundColor: '#a3ff87',
+    borderRadius: 17,
     height: '100%'
   },
   selectedMedium: {
     backgroundColor: '#f9ff87',
+    borderRadius: 17,
     height: '100%'
   },
   selectedHard: {
     backgroundColor: '#ff8787',
-    height: '100%',
+    borderRadius: 17,
+    height: '100%'
   },
 })

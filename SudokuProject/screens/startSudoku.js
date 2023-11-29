@@ -1,11 +1,15 @@
-import { Button, View, StyleSheet, TouchableOpacity, Text, Activit, ActivityIndicator, Alert } from "react-native";
-import Grid from "../components/grid";
+import { View, StyleSheet, Text, ActivityIndicator, Alert } from "react-native";
 import { useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from "../components/button";
+import RadioButtons from "../components/radioButtons";
+import { useTranslation } from "react-i18next";
+import { globalStyles } from "../styles/global";
 
 
 export default function StartSudoku( { navigation }) {
+
+  const { t } = useTranslation();
 
   let value = [
     [5,0,0,0,0,1,0,0,0],
@@ -45,6 +49,8 @@ export default function StartSudoku( { navigation }) {
 
   const [fetching, setFetching] = useState(false);
 
+  const [difficultyCode, setDifficultyCode] = useState(1);
+
   const getGrids = async (key) => {
     try {
       const jsonValue = await AsyncStorage.getItem(key);
@@ -57,7 +63,24 @@ export default function StartSudoku( { navigation }) {
   };
 
 
-  const startSudoku = async (difficulty) => {
+  const startSudoku = async () => {
+
+
+    let difficulty;
+    console.log("Kode: " + difficultyCode);
+    switch (difficultyCode) {
+      case 0:
+        difficulty = "easy-grids";
+        break;
+      case 1:
+        difficulty = "medium-grids";
+        break;
+      case 2:
+        difficulty = "hard-grids";
+        break;
+      default: 
+        difficulty = "medium-grids"
+    }
 
     setFetching(true);
     
@@ -86,77 +109,69 @@ export default function StartSudoku( { navigation }) {
       
       navigation.navigate('PlaySudoku', {
         value: value,
-      init: init,
-      solution: solution
+        init: init,
+        solution: solution,
+        difficulty: difficulty
     });
+  }
+  setFetching(false);
+}
+
+const resume = async () => {
+  setFetching(true);
+  try {
+
+    
+    const key = "save";
+    const jsonValue = await AsyncStorage.getItem(key);
+    
+    console.log(JSON.parse(jsonValue));
+    if (jsonValue == null) {
+      Alert.alert("Cannot start sudoku", "There is no saved game")
+    } else {
+      const resumeValues = JSON.parse(jsonValue);
+      
+      navigation.navigate('PlaySudoku', {
+        value: resumeValues.value,
+        init: resumeValues.init,
+        solution: resumeValues.solution,
+        difficulty: resumeValues.difficulty,
+        colors1: resumeValues.colors
+      });
+    }
+    
+  } catch (e) {
+    console.log(e.message);
   }
   setFetching(false);
 }
   
   
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Start Sudoku</Text>
-      {
-      !fetching ?
-        <View>
-          <CustomButton title="Start easy sudoku" style={styles.button} onPress={() => {startSudoku("easy-grids")}}/>
-          <CustomButton title="Start medium sudoku" style={styles.button} onPress={() => {startSudoku("medium-grids")}}/>
-          <CustomButton title="Start hard sudoku" style={styles.button} onPress={() => {startSudoku("hard-grids")}}/>
+    <View style={globalStyles.container}>
+      <Text style={styles.header}>{t("Start Sudoku")}</Text>
+        {!fetching ? <View>
+          <Text>{t("Select difficulty")}:</Text>
+          <RadioButtons onPress={(difficultyCode) => {setDifficultyCode(difficultyCode)}} initialValue={difficultyCode}/>
+          <View style={styles.container2}>
+            <CustomButton title={t("Start sudoku")} onPress={() => {startSudoku()}}/>
+            <CustomButton title={t("Resume game")} onPress={() => {resume()}}/>
+          </View>
         </View>
-        : <ActivityIndicator />}
+        : <ActivityIndicator size={'large'} />}
   
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  button: {
-    marginTop: 10,
-    marginBottom: 10,
-    width: '50%',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-  radioButton: {
-    width: 75,
-    height: 50,
-    backgroundColor: '#fff',
-    // borderRadius: 20,
-    borderColor: '#000',
-    borderWidth: 3,
-    marginTop: 20,
-  },
-  radioButtonText: {
-    textAlign: 'center'
-  },
-  radioButtonGroup: {
-    flexDirection: 'row',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  },
-  selectedEasy: {
-    backgroundColor: '#a3ff87',
-    height: '100%'
-  },
-  selectedMedium: {
-    backgroundColor: '#f9ff87',
-    height: '100%'
-  },
-  selectedHard: {
-    backgroundColor: '#ff8787',
-    height: '100%',
-  },
   header: {
     fontWeight: 'bold',
-    fontSize: 24,
+    fontSize: 30,
     textAlign: 'center',
-    marginBottom: 30
+    marginBottom: 60
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  container2: {
+    marginTop: 40 
+  }
 })

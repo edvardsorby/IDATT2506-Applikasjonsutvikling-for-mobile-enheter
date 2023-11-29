@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { View, StyleSheet, TextInput, Text, Button, Alert } from "react-native";
+import { globalStyles } from "../styles/global";
 
 export default function Grid( {data} ) {
 
@@ -16,8 +17,7 @@ export default function Grid( {data} ) {
     for (let i = 0; i < 9; i++) {
       const key = n + "" + i;
       cells.push(
-        <View style={[styles.cell, i == 3 ? styles.marginLeft : null, i == 5 ? styles.marginRight : null]} key={key}>
-          {/* <TextInput style={styles.textInput} value={sudoku[n][i] != 0 ? sudoku[n][i].toString() : null} editable={false} /> */}
+        <View style={[styles.cell, i == 3 ? styles.marginLeft : null, i == 5 ? styles.marginRight : null, sudoku[n][i] != 0 ? globalStyles.greyedOut : null]} key={key}>
           <Text style={styles.textInput}>{sudoku[n][i] != 0 ? sudoku[n][i].toString() : null}</Text>
         </View>
       )
@@ -80,10 +80,9 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: 20,
     textAlign: 'center',
-    color: '#bdbdbd'
   },
   greyedOut: {
-    color: '#777'
+    backgroundColor: '#ddd'
   },
   green: {
     backgroundColor: '#a3ff87',

@@ -1,10 +1,9 @@
-import { Button, View, StyleSheet, TouchableOpacity, Text, Image, ActivityIndicator } from "react-native";
-import Grid from "../components/grid";
+import { View, StyleSheet, Image } from "react-native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import i18next from "i18next";
 import CustomButton from "../components/button";
+import { initializeData } from "../data/sampleData";
+import { globalStyles } from "../styles/global";
 
 export default function Home({ navigation }) {
 
@@ -15,20 +14,16 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     if (i18n.isInitialized) {
-      setLangloaded(true);
-      console.log(true);
-      
-    } else {
-      console.log(false);
+      setLangloaded(true); 
     }
+    initializeData();
   });
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.container}>
       <Image source={require('../assets/sudoku-logo.png')} style={styles.logo}/>
       <CustomButton title={langLoaded ? t("Play") : ""} onPress={() => navigation.navigate('StartSudoku')}/>
-      <CustomButton title={langLoaded ?t("Add/remove sudoku grids") : ""} onPress={() => navigation.navigate('SudokuList')}/>
-      {/* <CustomButton title={langLoaded ?t("Change language") : ""} onPress={changeLanguage}/> */}
+      <CustomButton title={langLoaded ? t("Add/remove sudoku grids") : ""} onPress={() => navigation.navigate('SudokuList')}/>
     </View>
   )
 }

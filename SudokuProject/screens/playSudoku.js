@@ -1,11 +1,15 @@
-import { Button, View, StyleSheet, TouchableOpacity, Text, ActivityIndicator, TextInput, Alert } from "react-native";
-import Grid from "../components/grid";
-import { useState } from "react";
+import { View, StyleSheet, TouchableOpacity, Text, TextInput, Alert } from "react-native";
+import { useState, useEffect } from "react";
 import CustomButton from "../components/button";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTranslation } from "react-i18next";
+import { globalStyles } from "../styles/global";
 
 export default function PlaySudoku( { route } ) {
 
-  const { value, init, solution } = route.params;
+  const { t } = useTranslation();
+
+  const { value, init, solution, difficulty, colors1 } = route.params;
 
 
 
@@ -28,6 +32,13 @@ export default function PlaySudoku( { route } ) {
   ]);
 
 
+  useEffect(() => {   
+    if (colors1 != null) {
+      setColors(colors1);
+      console.log(colors1);
+    }
+  }, []);
+
 
   const findColor = function(n,i) {
 
@@ -35,11 +46,11 @@ export default function PlaySudoku( { route } ) {
 
     switch(color) {
       case 1:
-        return styles.green;
+        return globalStyles.green;
       case 2:
-        return styles.yellow;
+        return globalStyles.yellow;
       case 3:
-        return styles.red;
+        return globalStyles.red;
       default:
         return null;
     }
@@ -48,24 +59,24 @@ export default function PlaySudoku( { route } ) {
   const newRow = function(n) {
     const cells = [];
     
-    // console.log(sudoku);
     for (let i = 0; i < 9; i++) {
       const key = n + "" + i;
       let blank = true;
       if (!(initialValues[n][i] == 0)) blank = false
       cells.push(
-        <View style={[styles.cell, i == 3 ? styles.marginLeft : null, i == 5 ? styles.marginRight : null, findColor(n,i)]} key={key}>
-          <TextInput keyboardType="numeric" 
+        <View style={[styles.cell, i == 3 ? styles.marginLeft : null, i == 5 ? styles.marginRight : null, findColor(n,i), initialValues[n][i] != 0 ? globalStyles.greyedOut : null]} key={key}>
+          <TextInput 
+            keyboardType="numeric" 
             maxLength={1} 
-            style={styles.textInput} 
-            value={!blank ? sudoku[n][i].toString() : null}
+            style={[styles.textInput, initialValues[n][i] != 0 ? globalStyles.greyedOutText : null]}
+            defaultValue={sudoku[n][i] !== 0 ? sudoku[n][i].toString() : null}
             onChangeText={(e) => updateSudoku(e, key)}
-            editable={blank ? true : false} 
+            readOnly={initialValues[n][i] != 0 ? true : null}
             onFocus={() => {focus(key)}}
+            selectTextOnFocus={true}
             />
         </View>
       )
-      // console.log(key);
     }
     return cells;
   }
@@ -87,10 +98,11 @@ export default function PlaySudoku( { route } ) {
 
 
   const updateSudoku = function(e, key) {
-    
+    if (isNaN(e)) { 
+      e = 0;
+    } 
     console.log(sudoku);
     sudoku[key[0]][key[1]] = parseInt(e);
-    if (!(sudoku[key[0]][key[1]] > 0 && sudoku[key[0]][key[1]] < 10)) sudoku[key[0]][key[1]] = 0;
     console.log(sudoku);
   }
 
@@ -100,30 +112,30 @@ export default function PlaySudoku( { route } ) {
 
     if (JSON.stringify(sudoku) === JSON.stringify(solution)) {
       console.log("Correct solution!");
-      Alert.alert("Congratulations!", "You have solved the sudoku");
+      Alert.alert(t("Congratulations!"), t("You have solved the sudoku"));
     } else {
       console.log("Wrong solution");
-      Alert.alert("Wrong!", "You have not solved the sudoku correctly");
+      Alert.alert(t("Wrong!"), t("You have not solved the sudoku correctly"));
     }
   }
 
   const focus = function(key) {
     setSelectedCell(key);
     console.log(key);
-    }
+  }
     
-    const setGreen = function() {
-      if (selectedCell === null) return;
+  const setGreen = function() {
+    if (selectedCell === null) return;
 
-      setColors(prevColors => {
-        const newColors = [...prevColors];
-        newColors[selectedCell[0]][selectedCell[1]] = 1;
-        return newColors;
-      });
-    }
+    setColors(prevColors => {
+      const newColors = [...prevColors];
+      newColors[selectedCell[0]][selectedCell[1]] = 1;
+      return newColors;
+    });
+  }
     
-    const setYellow = function() {
-      if (selectedCell === null) return;
+  const setYellow = function() {
+    if (selectedCell === null) return;
 
       setColors(prevColors => {
       const newColors = [...prevColors];
@@ -152,52 +164,71 @@ export default function PlaySudoku( { route } ) {
     });
   }
 
+  const saveProgress = async () => {
+
+    const progress = {
+      value: sudoku,
+      init: init,
+      solution: solution,
+      difficulty: difficulty,
+      colors: colors
+    }
+
+    const key = "save";
+    const jsonValue = JSON.stringify(progress);
+
+    await AsyncStorage.setItem(key, jsonValue);
+    console.log("progress saved");
+    Alert.alert(t("Progress saved"));
+  }
+
 
   return (
-    <View style={styles.container}>
-      <Text>Play Sudoku</Text>
+    <View style={[globalStyles.container, styles.container]}>
+      <Text>{t("Difficulty")}: {t(difficulty)}</Text>
       <View style={styles.board}>
         {newBoard()}
       </View>
-      <Text>Color the cells:</Text>
+      <Text>{t("Color the cells")}:</Text>
 
-      <View style={styles.radioButtonGroup}>
+      <View style={globalStyles.radioButtonGroup}>
 
       <TouchableOpacity onPress={setClear}>
-          <View style={styles.radioButton}>
+          <View style={globalStyles.radioButton}>
               <View>
-                <Text style={styles.radioButtonText}>Clear</Text>
+                <Text style={globalStyles.radioButtonText}>{t("None")}</Text>
               </View>
           </View>
         </TouchableOpacity>
   
         <TouchableOpacity onPress={setGreen}>
-          <View style={styles.radioButton}>
-              <View style={styles.selectedEasy}>
-                <Text style={styles.radioButtonText}>Green</Text>
+          <View style={globalStyles.radioButton}>
+              <View style={globalStyles.selectedEasy}>
+                <Text style={globalStyles.radioButtonText}>{t("Green")}</Text>
               </View>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={setYellow}>
-        <View style={styles.radioButton}>
-              <View style={styles.selectedMedium}>
-                <Text style={styles.radioButtonText}>Yellow</Text>
+        <View style={globalStyles.radioButton}>
+              <View style={globalStyles.selectedMedium}>
+                <Text style={globalStyles.radioButtonText}>{t("Yellow")}</Text>
               </View>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={setRed}>
-        <View style={styles.radioButton}>
-              <View style={styles.selectedHard}>
-                <Text style={styles.radioButtonText}>Red</Text>
+        <View style={globalStyles.radioButton}>
+              <View style={globalStyles.selectedHard}>
+                <Text style={globalStyles.radioButtonText}>{t("Red")}</Text>
               </View>
           </View>
         </TouchableOpacity>
       </View>
       
-      <CustomButton title="Check answer" onPress={checkAnswer} />
-
+      <CustomButton title={t("Check answer")} onPress={checkAnswer} />
+      
+      <CustomButton title={t("Save progress")} onPress={saveProgress} />
     
     </View>
 
@@ -205,53 +236,11 @@ export default function PlaySudoku( { route } ) {
 }
 
 const styles = StyleSheet.create({
-  button: {
-    marginTop: 10,
-    marginBottom: 10,
-    width: '50%',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-  radioButton: {
-    width: 75,
-    height: 50,
-    backgroundColor: '#fff',
-    // borderRadius: 20,
-    borderColor: '#000',
-    borderWidth: 3,
-    marginTop: 20,
-  },
-  radioButtonText: {
-    textAlign: 'center'
-  },
-  radioButtonGroup: {
-    flexDirection: 'row',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  },
-  selectedEasy: {
-    backgroundColor: '#a3ff87',
-    height: '100%'
-  },
-  selectedMedium: {
-    backgroundColor: '#f9ff87',
-    height: '100%'
-  },
-  selectedHard: {
-    backgroundColor: '#ff8787',
-    height: '100%',
-  },
   header: {
     fontWeight: 'bold',
     fontSize: 24,
     textAlign: 'center',
     marginBottom: 30
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   board: {
     backgroundColor: '#333333',
@@ -286,15 +275,13 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   greyedOut: {
-    color: '#777'
+    backgroundColor: '#ddd'
   },
-  green: {
-    backgroundColor: '#a3ff87',
+  bold: {
+    fontWeight: 'bold'
   },
-  yellow: {
-    backgroundColor: '#f9ff87',
-  },
-  red: {
-    backgroundColor: '#ff8787',
-  },
+  container: {
+    justifyContent: 'flex-start',
+    paddingTop: 20
+  }
 })
